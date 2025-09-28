@@ -27,9 +27,9 @@ create database mydemo;
 use mydemo;
 
 SET @db_list = '["mydemo"]';
-SET @par = 'https://idazzjlcjqzj.objectstorage.ap-seoul-1.oci.customer-oci.com/n/idazzjlcjqzj/b/iot-csv/o/iot_telemetry_data02.csv';
+SET @par = '[https://idazzjlcjqzj.objectstorage.ap-seoul-1.oci.customer-oci.com/n/idazzjlcjqzj/b/iot-csv/o/iot_telemetry_data02.csv](https://objectstorage.ap-seoul-1.oraclecloud.com/p/VdhtVr9SRckNl5Jzzjd_-V9UOaLfS2xKu-RVnqxyMox4PhIpfhjjw2PA_olOc9Og/n/idazzjlcjqzj/b/bucket-lakehouseiot/o/iot_telemetry_data02.csv)';
 
-SET @ext_tables = '[{"db_name": "mydemo", "tables": [{"table_name": "iot_data", "dialect": {"format": "csv", "skip_rows": 1,  "date_format": "auto", "time_format": "auto","trim_spaces": true,  "field_delimiter": ",","record_delimiter": "\\n"}, "file": [{"par": "https://objectstorage.us-ashburn-1.oraclecloud.com/p/Pgz9ZJ91fRQs0Wlnzkr-eZnhSz7BGAsVeWwhEigna42PuWTOD7oQECjCvprJcAAs/n/idazzjlcjqzj/b/HWdatalake/o/airlines.csv" }] }] }]';
+SET @ext_tables = '[{"db_name": "mydemo", "tables": [{"table_name": "iot_data", "dialect": {"format": "csv", "skip_rows": 1,  "date_format": "auto", "time_format": "auto","trim_spaces": true,  "field_delimiter": ",","record_delimiter": "\\n"}, "file": [{"par": "https://objectstorage.ap-seoul-1.oraclecloud.com/p/VdhtVr9SRckNl5Jzzjd_-V9UOaLfS2xKu-RVnqxyMox4PhIpfhjjw2PA_olOc9Og/n/idazzjlcjqzj/b/bucket-lakehouseiot/o/iot_telemetry_data02.csv" }] }] }]';
 
 SET @options = JSON_OBJECT('mode', 'normal', 'external_tables', CAST(@ext_tables AS JSON));
 call sys.heatwave_load(@db_list, @options);
@@ -38,10 +38,10 @@ SELECT log->>"$.sql" AS "Load Script" FROM sys.heatwave_autopilot_report WHERE t
 ```
 #### 1-2. Using CSV file, Using PAR, manual laod
 ```
-CREATE TABLE IF NOT EXISTS `iot_data` (   `co` double,   `humidity` double ,   `temp` double  ) ENGINE=lakehouse SECONDARY_ENGINE=rapid   ENGINE_ATTRIBUTE='{"dialect": {"format": "csv", "field_delimiter":",", "record_delimiter": "\\n"},     "file": [{"par": "https://objectstorage.ap-seoul-1.oraclecloud.com/n/idazzjlcjqzj/b/iot-csv/o/iot_dataiot_telemetry_data3.csv"}]}';
+CREATE TABLE IF NOT EXISTS `iot_data` (   `co` double,   `humidity` double ,   `temp` double  ) ENGINE=lakehouse SECONDARY_ENGINE=rapid   ENGINE_ATTRIBUTE='{"dialect": {"format": "csv", "field_delimiter":",", "record_delimiter": "\\n"},     "file": [{"par": "https://objectstorage.ap-seoul-1.oraclecloud.com/p/VdhtVr9SRckNl5Jzzjd_-V9UOaLfS2xKu-RVnqxyMox4PhIpfhjjw2PA_olOc9Og/n/idazzjlcjqzj/b/bucket-lakehouseiot/o/iot_telemetry_data02.csv"}]}';
 
-ALTER TABLE hwdemo.supplier SECONDARY_LOAD;
-SELECT * FROM mydemo.iot_data LIMIT3;
+ALTER TABLE mydemo.iot_data SECONDARY_LOAD;
+SELECT * FROM mydemo.iot_data LIMIT 3;
 ```
 
 #### 1-3. Using TSV file, Using Resource Principal, manual laod

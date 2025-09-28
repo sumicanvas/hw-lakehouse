@@ -63,11 +63,18 @@ SELECT log->>"$.sql" AS "Load Script" FROM sys.heatwave_autopilot_report WHERE t
 ```
 
 
-#### 1-2. Using CSV file, Using PAR, manual laod
+#### 1-2. Using CSV file, Using PAR, manual laod (위의 과정이 정상적이라면 이부분은 건너뛰면 됩니다.) 
+
+다시 데이터를 테이블로 메뉴얼로 로딩할 때 아래 명령어를 이용하면 됩니다. <br>
 ```
 CREATE TABLE IF NOT EXISTS `iot_data` (   `co` double,   `humidity` double ,   `temp` double  ) ENGINE=lakehouse SECONDARY_ENGINE=rapid   ENGINE_ATTRIBUTE='{"dialect": {"format": "csv", "field_delimiter":",", "record_delimiter": "\\n"},     "file": [{"par": "https://objectstorage.ap-seoul-1.oraclecloud.com/p/VdhtVr9SRckNl5Jzzjd_-V9UOaLfS2xKu-RVnqxyMox4PhIpfhjjw2PA_olOc9Og/n/idazzjlcjqzj/b/bucket-lakehouseiot/o/iot_telemetry_data02.csv"}]}';
+```
 
+```
 ALTER TABLE mydemo.iot_data SECONDARY_LOAD;
+```
+
+```
 SELECT * FROM mydemo.iot_data LIMIT 3;
 ```
 

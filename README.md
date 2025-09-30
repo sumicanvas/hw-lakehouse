@@ -28,36 +28,32 @@ use mydemo;
 ```
 
 
+- HeatWave에 로드할 데이터베이스 목록을 '@db_list'라는 변수에 JSON 배열 형태로 저장<br>
 ```
 SET @db_list = '["mydemo"]';
 ```
 
-  
-```  
-SET @par = '[https://idazzjlcjqzj.objectstorage.ap-seoul-1.oci.customer-oci.com/n/idazzjlcjqzj/b/iot-csv/o/iot_telemetry_data02.csv](https://objectstorage.ap-seoul-1.oraclecloud.com/p/VdhtVr9SRckNl5Jzzjd_-V9UOaLfS2xKu-RVnqxyMox4PhIpfhjjw2PA_olOc9Og/n/idazzjlcjqzj/b/bucket-lakehouseiot/o/iot_telemetry_data02.csv)';
-```
-
-  
+ - 외부 테이블 로드를 위한 상세 설정 정보를 '@ext_tables' 변수에 JSON 형식으로 저장 <br> 
 ```
 SET @ext_tables = '[{"db_name": "mydemo", "tables": [{"table_name": "iot_data", "dialect": {"format": "csv", "skip_rows": 1,  "date_format": "auto", "time_format": "auto","trim_spaces": true,  "field_delimiter": ",","record_delimiter": "\\n"}, "file": [{"par": "https://objectstorage.ap-seoul-1.oraclecloud.com/p/VdhtVr9SRckNl5Jzzjd_-V9UOaLfS2xKu-RVnqxyMox4PhIpfhjjw2PA_olOc9Og/n/idazzjlcjqzj/b/bucket-lakehouseiot/o/iot_telemetry_data02.csv" }] }] }]';
 ```
 
-  
+- HeatWave 로드 프로시저에 전달할 최종 옵션을 '@options' 변수에 JSON 객체로 생성 <br>
 ```
 SET @options = JSON_OBJECT('mode', 'normal', 'external_tables', CAST(@ext_tables AS JSON));
 ```
 
-
+- HeatWave에 로드 : Object Storage의 CSV 파일이 'iot_data' 테이블로 생성 및 로드됨 <br>
 ```
 call sys.heatwave_load(@db_list, @options);
 ```
 
-
+- 데이터가 MySQL(InnoDB) 테이블에 정상적으로 로드되었는지 확인 <br>
 ```
 SELECT * FROM mydemo.iot_data LIMIT 3;
 ```
 
-
+- HeatWave 오토파일럿이 데이터 로드를 위해 내부적으로 생성하고 실행한 SQL 스크립트를 조회 <br>
 ```
 SELECT log->>"$.sql" AS "Load Script" FROM sys.heatwave_autopilot_report WHERE type = "sql" ORDER BY id\G
 ```
